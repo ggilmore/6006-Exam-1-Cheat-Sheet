@@ -97,11 +97,11 @@ $O(n\log_b{a}))$ will dominate the runtime.
 __Case 1__: If $f(n) = O(n^{\log_b{a - \epsilon}})$
 then the amount of work per level geometrically increases. $T(n) = \Theta{(n^{\log_b{a}})}$
 
-__Case 2__: If $f(n) = \Theta(n^{log_b{a}}log^k{n})$
+__Case 2__: If $f(n) = \Theta(n^{log_b{a}})$
 then the amount of work per level have about the same cost (i.e. work per level does not _polynomially_ increase or decrease, though work per level
-still may increase or decrease at some slower rate). We have to take the work of all levels into account and $T(n) = Θ(n^{\log_b{a}}\log^k{n}\log {n}) = \Theta(n\log_b{a}\log^{k+1}{n})$.
+still may increase or decrease at some slower rate). We have to take the work of all levels into account and $T(n) = Θ(n^{\log_b{a}}\log {n})$.
 
-__Case 3__: If $f(n) = O(n^{\log_b{a + \epsilon}})$
+__Case 3__: If $f(n) = \Omega(n^{\log_b{a + \epsilon}})$ and if $af(\frac{n}{b})\leq cf(n)$ for some constant $c < 1$ and all sufficiently large $n$
 then the amount of work per level geometrically decreases
 as we go down the tree. The work at the root level dominates and $T(n) = \Theta(f(n))$.
 
@@ -248,7 +248,7 @@ $T(n) = O(\log n)$
 
 ```python
 def build_max_heap(A):
-  for i in reversed(range(1,n))
+  for i in reversed(range(1,len(A)))
    max_heapify(A,i)
 ```
 
@@ -442,9 +442,8 @@ right subtree and 1 increase in the left subtree. In which case the total balanc
 Notice that this situation only happens if right-left (root 6 in example) subtree is higher than right-right
 subtree (root 8 in our example). Is there a way to cope with such a situation? You guessed it - we need
 to right-rotate the right subtree (then right-left subtree is not longer higher than right-right subtree and we
-land at the familiar Case 1: right right).
+land at the familiar __Case 1__: right right).
 
-Let’s see this in action!
 ```python
 # Step 1:
 tree.root.right = AVL_rotate_right(tree.root.right)
@@ -489,14 +488,14 @@ are $n!$ possible permutations of a size $n$ array
  = \Omega{(n\lg n)}
 \end{align*}
 
-#####Counting Sort
+#####Counting Sort(stable, not in place)
 
 Assume we only have elements $0, 1, ..., (k - 1 )$ in the array. We know that all zeros come before all ones
 etc. We can therefore put all the numbers in $k$ different buckets and later read them off.
 
 ```python
 def count_sort(array, k, key=lambda x: x):
-  """Stable sorts array by using key to determine ordering of elements.
+  """Stably sorts array by using key to determine ordering of elements.
   Assumes all elements are in range(0, k)"""
   # initialize array
   buckets = [[] for _ in range(k)]
@@ -515,7 +514,7 @@ We have the following steps: 1) allocate space for b buckets: $O(b)$, 2)loop thr
 
 Therefore the total complexity is $O(n + b)$. Note that in the case where you're trying to sort something that ranges from 1 to 10000, but you only have 10 elements, $b$ will dominate the runtime. This seems wasteful.
 
-#####Radix Sort
+#####Radix Sort(stable, not in place)
 
 Imagine that you want to compare two long numbers. For example 85823421348134214 and 85823421348452456. The algorithm you would use is to compare the first digit and if it is the same then
 compare the next digit etc. We can say that first digit is the primary comparison criterion, second digit is the secondary sorting criterion etc. This is almost correct, but we actually need to make sure that we
