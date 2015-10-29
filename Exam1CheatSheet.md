@@ -19,11 +19,7 @@ $$
 
 #####Stock Problem
 
-You are given an array $A[0..n-1]$ of stock prices for
-$n$ consecutive days, and want to pick two days $i_0$ and $j_0$,
-with $0 \leq i_0 \leq j_0 < n$ such if you buy a share of stock on day
-$i_0$ and sell it on day $j_0$ you have maximum gain.  That is,
-you want to maximize  $A[j_0] - A[i_0]$.
+
 ```python
 def lin(A):
     """ return best gain, computed by simple linear-time alg
@@ -40,40 +36,32 @@ def lin(A):
 
 ####Asymptotics
 
+$\frac{1}{n} < 1 < \lg{n} < n^{\frac{1}{2}} < n < n\lg{n}<n^2 < 2^n < n!$
+
+Sterling's formula: $n! \approx \sqrt{2 \pi n}(\frac{n}{e})^n$
+
 #####Strategies
 
-1) Take the limit of the ratio of the two functions being compared. If it tends to infinity, the numerator is larger. If it tends to 0, the denominator is larger. For example, suppose we want to compare $2^n$ to $3^n$. Then we see that: $\lim_{n\to\infty} = \frac{2^n}{3^n} = (\frac{2}{3})^n \rightarrow 0$
+$\lim_{n\to\infty} \frac{f(n)}{g(n)} = 0$ means that $f(n) = O(g(n))$
 
-2) Another useful technique is to transform the two functions by a strictly increasing function, like $\log{n}$ or $\sqrt{n}$, and compare the behavior of the functions then. For instance, it may be tricky to see how $2^{(\log_2{n})^2}$ compares to $n^{log_2 {n}}$ but if we take $\log_2$ of these, we see that they are asymptotically the same. Be careful to make sure you understand how constants transform under these functions. For instance, if you apply $\log_2$ to $n^2$ and $n^3$, the
-results are within a constant factor of each other. Still, after applying $\log$, functions are asymptotically the same only if they are within a constant __additive__ factor of each other.
+1) Transform: for example, $2^m$
 
-3) Finally, you can use L’hopital’s rule to determine asymptotic behavior. The rule states that: $\lim_{n\to\infty} \frac{f(n)}{g(n)} = \lim_{n\to\infty} \frac{f'(n)}{g'(n)}$
+2) Finally, you can use L’hopital’s rule to determine asymptotic behavior. The rule states that: $\lim_{n\to\infty} \frac{f(n)}{g(n)} = \lim_{n\to\infty} \frac{f'(n)}{g'(n)}$
 
 Note that we can repeatedly take the derivative until a clear trend is found. For an example, suppose we are trying to compare $\log n$ to $n
 ^{0.01}$. If we take the ratio of their derivatives, we obtain: $\lim_{n\to\infty} \frac{\frac{1}{n}}{\frac{.01}{n^.99}} = \lim_{n\to\infty} \frac{100}{n^{0.01}} \rightarrow 0$. This implies that $n^{0.01}$ is asymptotically greater.
 
 #### Recurrence Relations
 
-`Runtime of original problem` = `Runtime of reduced problem` + `Time taken to reduce problem`:
-$$
-T(n) = a \cdot T(\frac{n}{b}) + f(n)
-$$
-
-- $a$ - the # of subproblems that the original problem is divided into
-- $\frac{n}{b}$ - the size of each subproblem
-- $f(n)$ - how long it takes to divide into subproblems and combine the
-results of the subproblems
-
-
 ##### Recursion trees
 
-One way to solve recurrences is to draw a recursion tree where each node in the tree represents a subproblem and the value at each node represents the amount of work spent at each subproblem.
+Each node in the tree represents a subproblem; the value at each node represents the amount of work spent at each subproblem.
 The root node represents the original problem. In a recursion tree, every node that is not a leaf has
 a children, representing the number of subproblems it is splitting into. To figure out how much
 work is being spent at each subproblem, first find the size of the subproblem with the help of $b$,
 then substitute the size of the subproblem in the recurrence formula $T(n)$, then take the value of
 $f(n)$ as the amount of work spent at that subproblem. Long story short, a node with a problem size
-of $x$, the node will have a children each contributing $f(\frac{x}{b})$ amount of work.
+of $x$, the node will have a child each contributing $f(\frac{x}{b})$ amount of work.
 
 The work at the leaves is $T(1)$, since at that point we have divided the original problem up until it can no longer be further divided. Note that this means that the work contributed by the leaves are $O(1)$.
 
@@ -94,6 +82,12 @@ merge sort. However, there are two other cases that may happen.
 $O(n\log_b{a}))$ will dominate the runtime.
 
 ##### Master Theorem
+`Runtime of original problem` ($a$) = `Runtime of reduced problem` ($\frac{n}{b}$)+ `how long it takes to divide into subproblems and combine the
+results of the subproblems` ($f(n)$):
+$$
+T(n) = a \cdot T(\frac{n}{b}) + f(n)
+$$
+
 __Case 1__: If $f(n) = O(n^{\log_b{a - \epsilon}})$
 then the amount of work per level geometrically increases. $T(n) = \Theta{(n^{\log_b{a}})}$
 
@@ -105,20 +99,13 @@ __Case 3__: If $f(n) = \Omega(n^{\log_b{a + \epsilon}})$ and if $af(\frac{n}{b})
 then the amount of work per level geometrically decreases
 as we go down the tree. The work at the root level dominates and $T(n) = \Theta(f(n))$.
 
-__Example 1__: $T(n) = 2T(\frac{n}{2}) + 1$, __Example 2__: $T(n) = 2T(\frac{n}{2}) + n$ (merge sort), __Example 3__: $T(n) = 3T(\frac{n}{2}) + O(n)$ (Karatsuba multiplication), __Example 4__: $T(n) = 4T(\frac{n}{2}) + n^3$ ((naive) integer multiplication)
-
 ##### Change of Variables
 
-For some particularly tricky recurrences, it may be necessary to combine the existing methods
-we’ve looked at with a method known as change of variables. The idea behind change of variables
-is to rewrite a tricky recurrence in terms of a new variable that is somehow related to the old
-variable, solve the new recurrence, then change back to the original variable.
-Consider, for example, the following recurrence containing a square root:
 $$
 T(n) = 2T(\sqrt{n}) + Θ(\log{n})
 $$
 
-None of our existing methods provide an easy way to solve this recurrence. To solve this we can perform a change of variables by defining a new variable m as $n = 2^m$. Substituting this in gives:
+To solve this we can perform a change of variables by defining a new variable m as $n = 2^m$. Substituting this in gives:
 
 $$
 T(2^m) = 2T(
@@ -133,8 +120,7 @@ S(m) = T(2^m) = 2T(2^{\frac{m}{2}}) + \Theta(m)
 = 2S(\frac{m}{2}) + \Theta(m)
 $$
 
-Suddenly, we have a form we can work with using any of the previous methods we’ve learned.
-Using Master Theorem, for example, gives us $S(m) = m \log m$. Now we simply have to substitute
+Master Theorem gives us $S(m) = m \log m$. Now we simply have to substitute
 back to make this meaningful in the context of $T$ and $n$:
 $$
 S(m) = \Theta(m \log m)
@@ -145,6 +131,19 @@ T(n) = \Theta(\log{n}\log\log{n})
 $$
 
 ####Sorting
+
+####
+
+| Name  | Worst Case | Best Case| Stable | In Place | Comparison Based
+| :-----: |:-------------: | :---------: | :--------: | :--------: | :----:|
+| Insertion Sort| $O(n^2)$ (reverse sorted)| $O(n)$ (sorted)| Yes | Yes |Yes
+| Merge Sort| $O(n\lg{n})$| $O(n\lg{n})$| Yes | No | Yes
+| Heap Sort| $O(n\lg{n})$| $O(n\lg{n})$| No | Yes | Yes
+| BST (AVL) Sort| $O(n\lg{n})$| $O(n\lg{n})$ | Yes (\*) | No | Yes
+| Counting Sort| $O(n + b)$ | $O(n + b)$| Yes | No | No
+| Radix Sort| $O((n + b)\log_b a)$ | $O((n + b)\log_b a) \approx O(n)$| Yes | No | No
+
+(\*) If you see repeated elements, keep a list with all of the repeated elements in the node (in order)
 
 #####Insertion Sort (in place)
 
@@ -158,8 +157,8 @@ for i in range(1,n):
     i -= 1
 ```
 
-$T(n) = O(n^2)$
-Worst case is reverse sorted list. E.g. $A = [n-1, ..., 1, 0]$
+$T(n) = O(n^2)$ (really $T(n) = O(n +k)$, where $k$ is the number of swaps).
+Worst case is reverse sorted list. E.g. $A = [n-1, n-2, ..., 1, 0]$
 
 #####Divide and Conquer
 $T(n)$ = divide time + combine time
@@ -188,22 +187,26 @@ def merge(L,R):
 ```
 Complexity:
 
-1) divide: $\Theta{(n)}$
+1) __divide__: $\Theta{(n)}$, 2) __recursion__: $n_1 = n_2 = \frac{n}{2}$, $T(n_1) + T(n_2) = 2T(\frac{n}{2})$, 3) __merge__: $\Theta(1)$ per output element, $\Theta(n)$ total, $T(n) = 2T(\frac{n}{2}) + \Theta{(n)} = \Theta{(n\log n)}$
 
-2) recursion: $n_1 = n_2 = \frac{n}{2}$, $T(n_1) + T(n_2) = 2T(\frac{n}{2})$
+####Quick Data Structure Reference
+####
 
-3) merge: $\Theta(1)$ per output element, $\Theta(n)$ total
+| Name   | Insert         | Search | Successor | Successor with Pointer|Delete         | Find Max | Find Min
+| :-----:|:-----:         | :----: | :----:   | :----: | :----:         |:----:| :----: |
+| Min Heap | $O(\log n)$ | $O(n)$ | $O(n)$    |  $O(n)$|$O(\log n)$ | $O(n)$ | $O(1)$
+| Max Heap | $O(\log n)$ | $O(n)$ | $O(n)$    | $O(n)$| $O(\log n)$ | $O(1)$ | $O(n)$
+| AVL Tree | $O(\log n)$ | $O(\log n)$  | $O(\log n)$ | $O(\log n)$ | $O(\log n)$ | $O(\log n)$  | $O(\log n)$
+| BST | $O($`height`$)$ | $O($`height`$)$  | $O($`height`$)$| $O($`height`$)$ |  $O($`height`$)$ | $O($`height`$)$ |$O($`height`$)$
+| Sorted Array | $O(n)$ (\*)| $O(\log n)$ | $O(\log n)$ | $O(1)$ |$O(\log n)$ | $O(1)$ | $O(1)$
+| Unsorted Array | $O(1)$| $O(n)$ | $O(n)$ | $O(n)$ | $O(n)$ | $O(n)$ | $O(n)$
 
-$T(n) = 2T(\frac{n}{2}) + \Theta{(n)} = \Theta{(n\log n)}$
+(\*) have to shift all $n$ elements when inserting
 
 ####Priority Queue
 
 #####Operations
-`insert(S,x)`: insert `x` into set `S`
-
-`max(S)`: return element of S with largest key
-
-`extract_min(S)`: return element of S with largest key and remove it from S
+`insert(S,x)`: insert `x` into set `S`; `min(S)`: return element of S with largest key; `extract_min(S)`: return element of S with largest key and remove it from S
 
 #####Max Heap Property
 Key of a node is $\geq$ keys of its children
@@ -215,7 +218,7 @@ Key of a node is $\geq$ keys of its children
 
 - `left(i) = 2i`: returns index of node's left child  
 
-- `right(i) = 2i`: returns index of node's right child  
+- `right(i) = 2i + 1`: returns index of node's right child  
 
 #####Heap Operations
 
@@ -306,26 +309,6 @@ def find_min(x):
 
 - __Case 3__:  `x` has two children. Splice out `x`’s successor and replace `x` with `x`’s successor.
 
-```python
-def delete(node):
-  #Case 1 and 2 - node has no children or 1 child
-  if not node.left or not node.right:
-    if node is node.parent.left:
-      node.parent.left = node.left or node.right
-      if node.parent.left is not None:
-        node.parent.left.parent = node.parent
-    else:
-      node.parent.right = node.left or node.right
-      if node.parent.right is not None:
-        node.parent.right.parent = node.parent
-      return node
-  #Case 3  
-  else:
-    successor = successor(node)
-    node.key, successor.key = successor.key, node.key
-    return delete(successor)
-```
-
 - $T(n) = O($ height of tree $)$ (from the successor) call
 
 `find(k)`: returns a node with the key `k` (if it exists)
@@ -363,18 +346,21 @@ def successor(node):
 
 - $T(n) = O($ height of tree $)$
 
+`walk` - walk BST in order, return ordered list
+```python
+def walk(node):
+  if not node:
+    return []
+  return walk(node.left) + [node.key] + walk(node.right)
+```
+
 ####AVL Trees
 
 #####Augmentation
 
-In order to have the height of the AVL Tree be $O(\log n)$, keep track of every node's height.
+In order to have the height of the AVL Tree be $O(\log n)$, keep track of every node's height. Leaves have height 0, `None` has height -1
 
-- Leaves have height 0
-- `None` has height -1
-
-#####AVL Property
-Inherits all BST properties
-
+#####AVL Property (Inherits all BST properties)
 __Invariant__: for every node `x`, the heights of its `left` child and `right` child differ by at most 1. (update the height every time a node's subtree changes)
 
 Note: AVL Tree __not__ unique for a given set of keys
@@ -392,7 +378,6 @@ def AVL_rotate_left(node):
 
   # instead of old right node, old root takes old rights left subtree
   node.right = old_right_left
-
   # node’s children changed - we need to recompute the height
   node.recompute_height()
   # old root becomes left node of old right (which becomes new root)
@@ -457,8 +442,6 @@ __Cases 3 & 4__: left-left and right-left
 
 Those two cases are analogous to the cases 1 and 2, but used when the left tree is higher.
 
-![AVL Deletion](BSTDelete.pdf)
-
 ####Linear Time Sorting
 
 #####Comparison Sorting Lower Bound
@@ -477,8 +460,6 @@ Proof. (Hint: how many leaves are there?)
 are $n!$ possible permutations of a size $n$ array
 
 - A height-$h$ binary tree has $\leq 2^h$ leaves
-
-
 
 \begin{align*}
 2h \geq n! \\
